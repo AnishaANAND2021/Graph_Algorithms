@@ -2,30 +2,72 @@
 using namespace std;
 
 const int N = 1e5 + 10;
-vector<pair<int,int>> g[N];
+int parent[N];
+int size[N];
 
 int vis[N];
 int level[N];
 
+void make(int v)
+{
+    parent[v] = v;
+    size[v] = 1;
+}
+
+int find(int v)
+{
+    if (v == parent[v])
+        return v;
+    return parent[v] = find(parent[v]);
+}
+
+void Union(int a, int b)
+{
+    a = find(a);
+    b = find(b);
+    if (a != b)
+    {
+        if (size[a] < size[b])
+            swap(a, b);
+        parent[b] = a;
+        size[a] += size[b];
+    }
+}
 
 int main()
 {
-    int no_of_vertices, no_of_edges;
-    cout << "Enter the no of vertices : ";
-    cin >> no_of_vertices;
-    cout << "Enter the no of edges : ";
-    cin >> no_of_edges;
-    cout<<"Enter the adjacent edges : \n";
-    while (no_of_edges--)
+    int vertices, edges;
+    cout<<"Enter the number of nodes : ";
+    cin >> vertices ;
+    cout<<"Enter the number of edges : ";
+    cin>> edges;
+    vector<pair<int, pair<int, int>>> edge;
+    cout<<"Enter the adjacent nodes and their weigth ";
+    for (int i = 0; i < edges; i++)
     {
-        int n, m,w;
-        cin >> n >> m>>w;
-        //g[m].push_back(n);
-        g[n].push_back({m,w});
+        int u, v, wt;
+        cin >> u >> v >> wt;
+        edge.push_back({wt, {u, v}});
     }
-    int root;
-    cout << "Enter the root node : ";
-    cin >> root;
-    
+    sort(edge.begin(), edge.end());
+    for (int i = 1; i <= vertices; i++)
+        make(i);
+    int total_cost = 0;
+    cout<<"Minimum spanning tree is : \n";
+    for (auto &e : edge)
+    {
+        int wt = e.first;
+        int u = e.second.first;
+        int v = e.second.second;
+        if (find(u) == find(v))
+            continue;
+        Union(u, v);
+        total_cost += wt;
+        cout<<u<<' '<<v<<endl;
+    }
+    cout<<"Total cost : "<<total_cost<<endl;
     return 0;
 }
+
+// Time Complexity=O(alpha(n)) <-amortrized time complexity
+//  alpha(n) Reverse Ackerman function
